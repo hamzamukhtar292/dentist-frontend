@@ -1,33 +1,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --color-base: #1d1d1d;
+    --color-base2: #282828;
+    --color-base3: #424346;
+    --color-base4: #282828;
+    --color-main1: #10838b;
+    --color-main2: #54bac1;
+    --color-main3: #1d8c93;
+    --color-main4: rgba(95, 216, 224, 0.3);
+    --color-main5: #ffffff;
+    --color-main6: #1d1d1d;
+    --color-grey1: #424346;
+    --color-grey2: #6e6f74;
+    --color-grey3: #898a8f;
+    --color-grey4: #b3b4b8;
+    --color-grey5: #e5e5e6;
+    --color-grey6: #898a8f;
+    --color-grey7: #b3b4b8;
+    --color-input-main: #424346;
+    --color-primary2: #46cdcf;
+    --color-secondary1: #24d2fd;
+    --color-border-base: #424346;
+    --color-border-base2: #424346;
+    --color-border-base3: rgba(255, 255, 255, 0.2);
+    --color-text-base: #ffffff;
+    --color-text-base2: #898a8f;
+    --color-footer-base: #53565f;
+    --color-textMain: #ffffff;
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-base: #ffffff;
+    --color-base2: #f7f7f7;
+    --color-base3: #edeef3;
+    --color-base4: #ffffff;
+    --color-main1: #10838b;
+    --color-main2: #0a676d;
+    --color-main3: #034e53;
+    --color-main4: rgba(16, 131, 139, 0.3);
+    --color-main5: #1d1d1d;
+    --color-main6: #f8f8fa;
+    --color-secondary1: #0098bd;
+    --color-grey1: #424346;
+    --color-grey2: #6e6f74;
+    --color-grey3: #898a8f;
+    --color-grey4: #b3b4b8;
+    --color-grey5: #e5e5e6;
+    --color-grey6: #7e8598;
+    --color-grey7: #b4bacc;
+    --color-input-main: #e5e5e6;
+    --color-primary2: #407e95;
+    --color-border-base: #d0d7dc;
+    --color-border-base2: #1d1d1d;
+    --color-border-base3: rgba(29, 29, 29, 0.4);
+    --color-text-base: #1d1d1d;
+    --color-text-base2: #606679;
+    --color-textMain: #1d1d1d;
+    --color-footer-base: linear-gradient(to right, #666161 100%, #424242 100%);
   }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: 'Poppins', sans-serif;
 }
 
+::placeholder {
+  color: rgb(var(--color-placeholder));
+}
+
+/* Example utility classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #ccc;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.tab.active {
+  border-bottom: 2px solid #000;
+  font-weight: bold;
 }
