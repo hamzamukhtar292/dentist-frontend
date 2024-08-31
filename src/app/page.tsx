@@ -18,9 +18,8 @@ export default function Home() {
   }, [isAuthenticated, router]);
 
   return (
-    <div>
-      {/* Optional loading indicator */}
-      <p>Loading...</p>
+    <div className='bg-base font-poppins '>
+      <p className=' text-3xl h-screen items-center justify-center'>Loading...</p>
     </div>
   );
 }

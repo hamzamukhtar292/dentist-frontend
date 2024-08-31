@@ -1,49 +1,86 @@
-// src/app/login/page.tsx
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+/* eslint-disable react/jsx-no-undef */
+"use client"
+import React, { useState } from 'react';
+import { useLogin } from '../hooks/useAuth';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('john.doe@example.com');
+  const [password, setPassword] = useState('hamza123');
+  const { mutate, data, error, status, isError, isSuccess } = useLogin();
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/api/login', { email, password });
-      login(response.data.token);
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Invalid credentials');
-    }
+    mutate({ email, password });
   };
 
+  // Redirect to dashboard after successful login
+  if (isSuccess && data) {
+    login(data.token);
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userId', data.userId);
+    router.push('/dashboard');
+  }
+
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="flex font-poppins flex-col items-center justify-center min-h-screen bg-base">
+      <div className="w-96 p-8 shadow-lg rounded-lg bg-base border border-borderBase">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col text-center justify-center items-center w-full">
+            <h2 className="text-2xl font-bold text-textMain mb-8">Login</h2>
+            <Image
+              src="/logo.png" // Path to the logo in the public directory
+              alt="Logo"
+              width={150} // Adjust width as needed
+              height={120} // Adjust height as needed
+              className="mb-2" // Add margin bottom to separate logo from form
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-grey3 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
+            />
+          </div>
+          <button
+            className="w-full p-3 bg-grey6 text-white rounded-md transition"
+            type="submit"
+            disabled={status === "pending"}
+          >
+            {status === "pending" ? 'Logging in...' : 'Login'}
+          </button>
+          {isSuccess && <p>Login successful!</p>}
+          {isError && <p>Error: {error?.message}</p>}
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default LoginPage;

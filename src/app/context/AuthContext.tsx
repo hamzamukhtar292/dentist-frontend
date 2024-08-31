@@ -1,4 +1,3 @@
-// src/app/context/AuthContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -14,15 +13,27 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    // Initialize token from localStorage
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  });
+
   const router = useRouter();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
+    // Sync the state with localStorage
+    if (!token) {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        setToken(storedToken);
+      } else {
+        router.push('/login'); // If no token, redirect to login
+      }
     }
-  }, []);
+  }, [token, router]);
 
   const login = (newToken: string) => {
     setToken(newToken);

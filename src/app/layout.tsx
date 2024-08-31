@@ -1,7 +1,7 @@
 // src/app/layout.tsx
 import { AuthProvider } from './context/AuthContext';
 import { ReactQueryProvider } from './context/ReactQueryProvider';
-
+import './globals.css'
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
