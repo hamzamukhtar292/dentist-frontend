@@ -30,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
 
   return (
     <header 
-    className="bg-base font-inter border-base3 xs:px-4 flex h-[72px] items-center justify-between border-b py-4 md:px-[50px]"
+    className="bg-base font-inter border-base3 xs:px-4 flex h-[72px] items-center justify-between border-b py-4 md:px-[40px]"
 >
      
       <div className="flex items-center">
