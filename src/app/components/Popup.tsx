@@ -2,25 +2,29 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
-
+import { usePatient } from '../hooks/usePatient';
 interface PopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddPatient: (patientData: { name: string; age: number; phoneNumber: string; address: string }) => void;
 }
 
-const Popup: React.FC<PopupProps> = ({ isOpen, onClose, onAddPatient }) => {
+const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
   const [name, setName] = useState('');
   const [age, setAge] = useState(0);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [todayTurn, setTodayTurn] = useState('');
+  const { mutate, data, error, status, isError, isSuccess } = usePatient();
 
 
-  const handleSubmit = () => {
-    onAddPatient({ name, age, phoneNumber, address });
-    onClose(); // Close the popup after submitting
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutate({ name, age, phoneNumber, address, todayTurn });
   };
+
+  if (isSuccess && data) {
+    console.log(data);
+  }
 
   if (!isOpen) return null;
 

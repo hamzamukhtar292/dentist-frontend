@@ -2,29 +2,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '../api/api';
 import Header from '../components/Header';
 import Popup from '../components/Popup';
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+import EditPopup from '../components/EditPopup';
+import DiagnosePopup from '../components/DiagnosePopup';
 import Image from 'next/image';
-import plus from '../../../public/plus.svg'; 
+import plus from '../../../public/plus.svg';
+import edit from '../../../public/edit.svg';
+import moment from 'moment';
+
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+
 interface Patient {
   id: string;
   name: string;
   turnNumber: number;
-  date: string; // Assuming you have a date field to filter by today's date
+  date: string;
+  age: string;
+  address: string;
+  phoneNumber: number;
 }
 
 export default function DashboardPage() {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const [newPatientName, setNewPatientName] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null); // State for the selected patient
+  const [isDiagnose, setIsDiagnose] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null); // State for the selected patient ID
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -32,7 +43,7 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, router]);
 
-  const userId = localStorage.getItem("userId")
+  const userId = localStorage.getItem('userId');
   const fetchUserData = async () => {
     if (!userId) {
       throw new Error('User ID not found');
@@ -40,110 +51,148 @@ export default function DashboardPage() {
     const response = await axiosInstance.get(`${baseURL}/api/user/${userId}`);
     return response.data;
   };
-  const { isPending, isError, data, error } = useQuery({
+
+  // UseQuery for Fetching User Data
+  const { isLoading: isUserLoading, isError: isUserError, data: userData, error: userError } = useQuery({
     queryKey: ['user'],
     queryFn: fetchUserData,
-    enabled: !!userId,
-  })
-  if (isPending) {
-    return <span>Loading...</span>
-  }
+    enabled: !!userId, // Only run if userId is available
+  });
 
-  if (isError) {
-    return <span>Error: {error.message}</span>
-  }
-
-  // const fetchPatients = async () => {
-  //   const response = await axiosInstance.get(`${baseURL}/api/patients`);
-  //   return response.data;
-  // };
-
-  // const { isPending, isError, data, error } = useQuery({
-  //   queryKey: ['patients'],
-  //   queryFn: fetchPatients,
-  // });
-
-  // const addPatientMutation = useMutation(
-  //   async (patientData: { name: string; age: number; phoneNumber: string; address: string }) => {
-  //     const response = await axiosInstance.post(`${baseURL}/api/patients`, patientData);
-  //     return response.data;
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries(['patients']);
-  //       setIsPopupOpen(false); // Close the popup after successful addition
-  //     },
-  //   }
-  // );
-
-  const handleAddPatient = (patientData: { name: string; age: number; phoneNumber: string; address: string }) => {
-    // addPatientMutation.mutate(patientData);
+  const fetchPatients = async () => {
+    const response = await axiosInstance.get(`${baseURL}/api/patients/today`);
+    return response.data;
   };
 
-  // if (isPending) {
-  //   return <span>Loading...</span>;
-  // }
+  const { isLoading: isPatientsLoading, isError: isPatientsError, data: patientsData, error: patientsError } = useQuery({
+    queryKey: ['patients'],
+    queryFn: fetchPatients,
+  });
 
-  // if (isError) {
-  //   return <span>Error: {error.message}</span>;
-  // }
+  if (isUserLoading || isPatientsLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isUserError) {
+    return <span>Error loading user data: {userError.message}</span>;
+  }
+  if (isPatientsError) {
+    return <span>Error loading patients data: {patientsError.message}</span>;
+  }
 
   if (!isAuthenticated) {
     return null;
   }
 
-  // Filter patients for today
-  const today = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-  // const patientsToday = data?.filter((patient: Patient) => patient.date === today) || [];
+  const handleEdit = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent the row click event from firing
+    const patient = patientsData?.find((p: Patient) => p.id === id); // Find the patient by id
+    setSelectedPatient(patient); // Set the selected patient data
+    setOpenEdit(true);
+  };
+
+  const handleRowClick = (id: string) => {
+    // Set the selected patient ID and open the diagnose popup
+    setSelectedPatientId(id);
+    setIsDiagnose(true);
+  };
 
   return (
     <>
-      <Header  user={data}/>
-      <div className="flex font-poppins flex-col items-center justify-center min-h-screen bg-base2 p-4">
-        <h1 className="text-2xl mb-4">Dashboard</h1>
-        <p className="mb-4">Welcome, </p>
-        
-        <button
-          onClick={() => setIsPopupOpen(true)}
-          className="mb-4 p-2 bg-black w-52 text-xl text-white text-medium items-center flex justify-center gap-x-3 rounded"
-        >
-          <Image src={plus} alt="Close" width={16} height={16} />
-
-          Add Patient
-        </button>
+      <Header user={userData} />
+      <div className="flex font-poppins flex-col min-h-screen bg-base2 py-4 px-10">
+        <div className="flex flex-row justify-end">
+          <button
+            onClick={() => setIsPopupOpen(true)}
+            className="mb-4 p-2 bg-black w-52 text-xl text-main text-medium items-center flex justify-center gap-x-3 rounded"
+          >
+            <Image src={plus} alt="Add Patient" width={16} height={16} />
+            Add Patient
+          </button>
+        </div>
 
         {/* Patients Table */}
-        <div className="w-full max-w-4xl">
-          <h2 className="text-xl mb-2">Patients for Today</h2>
-          {/* {patientsToday.length > 0 ? (
-            <table className="min-w-full bg-white border border-gray-300">
+        <div className="w-full">
+          <div className="flex flex-row items-center gap-x-5">
+            <h2 className="text-xl mb-3 text-main">Patients for Today:</h2>
+            <h2 className="text-body1 mb-3 text-main1">{moment().format('MMMM Do YYYY')}</h2>
+          </div>
+
+          {patientsData?.length > 0 ? (
+            <table className="min-w-full bg-base border border-borderBase">
               <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">Name</th>
-                  <th className="py-2 px-4 border-b">Turn Number</th>
+                <tr className="border-b border-borderBase text-left">
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Turn Number</h3>
+                  </th>
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Name</h3>
+                  </th>
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Age</h3>
+                  </th>
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Address</h3>
+                  </th>
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Cell number</h3>
+                  </th>
+                  <th className="py-2 px-4">
+                    <h3 className="text-main text-grey4">Edit</h3>
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {patientsToday.map((patient: Patient) => (
-                  <tr key={patient.id}>
-                    <td className="py-2 px-4 border-b">{patient.name}</td>
-                    <td className="py-2 px-4 border-b">{patient.turnNumber}</td>
+                {patientsData?.map((patient: Patient) => (
+                  <tr key={patient.id} onClick={() => handleRowClick(patient.id)} className="border-b border-borderBase">
+                    <td className="py-2 px-4">
+                      <h3 className="text-main">{patient.turnNumber}</h3>
+                    </td>
+                    <td className="py-2 px-4">
+                      <h3 className="text-main">{patient.name}</h3>
+                    </td>
+                    <td className="py-2 px-4">
+                      <h3 className="text-main">{patient.age}</h3>
+                    </td>
+                    <td className="py-2 px-4">
+                      <h3 className="text-main">{patient.address}</h3>
+                    </td>
+                    <td className="py-2 px-4">
+                      <h3 className="text-main">{patient.phoneNumber}</h3>
+                    </td>
+                    <td className="py-2 px-4" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={(e) => handleEdit(e, patient.id)} // Pass the event and id
+                        className="p-1"
+                        aria-label="Edit"
+                      >
+                        <Image src={edit} alt="Edit" width={20} height={20} />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
             <p>No patients for today.</p>
-          )} */}
+          )}
         </div>
-       
       </div>
 
-      <Popup 
-        isOpen={isPopupOpen} 
-        onClose={() => setIsPopupOpen(false)} 
-        onAddPatient={handleAddPatient} 
-      />
+      {/* Add Patient Popup */}
+      <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+
+      {/* Edit Patient Popup */}
+      {selectedPatient && (
+        <EditPopup
+          isOpen={openEdit}
+          onClose={() => setOpenEdit(false)}
+          patientData={selectedPatient} // Pass selected patient data
+        />
+      )}
+
+      {/* Diagnose Popup */}
+      <DiagnosePopup isOpen={isDiagnose} onClose={() => setIsDiagnose(false)} patientId={selectedPatientId} />
     </>
   );
 }
