@@ -19,7 +19,7 @@ import { toast } from 'react-toastify';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-interface Patient {
+interface Staff {
   id: string;
   name: string;
   turnNumber: number;
@@ -30,13 +30,13 @@ interface Patient {
   todayTurn: number;
 }
 
-export default function DashboardPage() {
+export default function AboutPage() {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null); // State for the selected patient
+  const [selectedPatient, setSelectedPatient] = useState<Staff | null>(null); // State for the selected patient
   const [isDiagnose, setIsDiagnose] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null); // State for the selected patient ID
 
@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
   const handleEdit = (e: React.MouseEvent, id: string) => {
     e.stopPropagation(); // Prevent the row click event from firing
-    const patient = patientsData?.find((p: Patient) => p.id === id); // Find the patient by id
+    const patient = patientsData?.find((p: Staff) => p.id === id); // Find the patient by id
     setSelectedPatient(patient); // Set the selected patient data
     setOpenEdit(true);
   };
@@ -109,14 +109,13 @@ console.log({patientsData});
             className="mb-4 p-2 bg-black w-52 text-xl text-main text-medium items-center flex justify-center gap-x-3 rounded"
           >
             <Image src={plus} alt="Add Patient" width={16} height={16} />
-            Add Patient
+            Add Staff
           </button>
         </div>
         {/* Patients Table */}
         <div className="w-full">
           <div className="flex flex-row items-center gap-x-5">
-            <h2 className="text-xl mb-3 text-main">Patients for Today:</h2>
-            <h2 className="text-body1 mb-3 text-main1">{moment().format('MMMM Do YYYY')}</h2>
+            <h2 className="text-xl mb-3 text-main">Total staff members</h2>
           </div>
 
           {patientsData?.length > 0 ? (
@@ -144,7 +143,7 @@ console.log({patientsData});
                 </tr>
               </thead>
               <tbody>
-                {patientsData?.map((patient: Patient) => (
+                {patientsData?.map((patient: Staff) => (
                   <tr key={patient.id} onClick={() => handleRowClick(patient.id)} className="border-b border-borderBase rounded-3xl">
                     <td className="py-2 px-4">
                       <h3 className="text-main">{patient.todayTurn}</h3>
@@ -179,11 +178,7 @@ console.log({patientsData});
           )}
         </div>
       </div>
-
-      {/* Add Patient Popup */}
       <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
-
-      {/* Edit Patient Popup */}
       {selectedPatient && (
         <EditPopup
           isOpen={openEdit}
@@ -191,9 +186,6 @@ console.log({patientsData});
           patientData={selectedPatient} // Pass selected patient data
         />
       )}
-
-      {/* Diagnose Popup */}
-      <DiagnosePopup isOpen={isDiagnose} onClose={() => setIsDiagnose(false)} patientId={selectedPatientId} />
     </>
   );
 }

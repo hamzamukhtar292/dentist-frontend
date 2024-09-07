@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
 import { usePatient } from '../hooks/usePatient';
+import { toast } from 'react-toastify';
 
 interface PopupProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ console.log({patientData});
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutate({ name, age, phoneNumber, address, todayTurn });
+    toast.success("Patient details updated");
+
   };
 
   if (isSuccess && data) {

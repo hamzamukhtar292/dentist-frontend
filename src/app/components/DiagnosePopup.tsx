@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
 import { usePatient } from '../hooks/usePatient';
+import { toast } from 'react-toastify';
 
 interface PopupProps {
   isOpen: boolean;
@@ -35,6 +36,8 @@ const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutate({ name, diagnose, detailedDiagnose, treatment });
+    toast.success("Added diagnose details");
+    onClose()
   };
 
   if (isSuccess && data) {
