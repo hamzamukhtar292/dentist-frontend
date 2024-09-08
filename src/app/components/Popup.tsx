@@ -4,6 +4,8 @@ import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
 import { usePatient } from '../hooks/usePatient';
 import { toast } from 'react-toastify';
+import axiosInstance from '../api/api';
+import { useQuery } from '@tanstack/react-query';
 interface PopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +25,11 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     mutate({ name, age, phoneNumber, address, todayTurn });
     onClose();
     toast.success("Added new patient");
+    setAddress("")
+    setName("")
+    setAge(0)
+    setPhoneNumber('')
+    setTodayTurn('')
   };
 
   if (isSuccess && data) {

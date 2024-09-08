@@ -4,19 +4,15 @@ import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
 import { usePatient } from '../hooks/usePatient';
 import { toast } from 'react-toastify';
+import axiosInstance from '../api/api';
+import { useQuery } from '@tanstack/react-query';
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 interface PopupProps {
   isOpen: boolean;
   onClose: () => void;
   patientData?: any; // Make patientData optional
 }
-
-const doctors = [
-  { id: '1', name: 'Dr. Smith' },
-  { id: '2', name: 'Dr. Johnson' },
-  { id: '3', name: 'Dr. Lee' },
-  // Add more doctors as needed
-];
 
 const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
   const [diagnose, setDiagnose] = useState('');
@@ -25,11 +21,23 @@ const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) =
   const [doctor, setDoctor] = useState('');
   const { mutate, data, error, status, isError, isSuccess } = usePatient();
 
+  const fetchDoctorsData = async () => {
+    const response = await axiosInstance.get(`${baseURL}/api/doctors`);
+    return response.data;
+  };
+
+  // UseQuery for Fetching User Data
+  const { isLoading: isDoctorLoading, isError: isDoctorError, data: doctorsData, error: doctorError } = useQuery({
+    queryKey: ['doctors'],
+    queryFn: fetchDoctorsData,
+  });
+console.log({doctorsData});
   useEffect(() => {
     if (patientData) {
       setDiagnose(patientData.diagnose || '');
       setDetailedDiagnose(patientData.detailedDiagnose || '');
       setTreatment(patientData.treatment || '');
+      setDoctor(patientData.doctor)
     }
   }, [patientData]); // Run this effect when patientData changes
 
@@ -69,9 +77,9 @@ const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) =
             className="w-full p-3 rounded-md border-none bg-inputMain text-main"
           >
             <option value="" disabled>Select a doctor</option>
-            {doctors.map(doc => (
-              <option key={doc.id} value={doc.name}>
-                {doc.name}
+            {doctorsData.map((doctor:any) => (
+              <option key={doctor.id} value={doctor.id}>
+                {doctor.name}
               </option>
             ))}
           </select>
@@ -83,7 +91,7 @@ const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) =
             type="text"
             value={diagnose}
             onChange={(e) => setDiagnose(e.target.value)}
-            placeholder="Patient's address"
+            placeholder="Diagnose"
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
           />
 
@@ -97,7 +105,6 @@ const DiagnosePopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) =
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
             rows={4}
           ></textarea>
-
           <label htmlFor="treatment" className="block text-sm font-medium text-grey3 mb-2">
             Treatment
           </label>
