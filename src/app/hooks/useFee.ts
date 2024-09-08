@@ -1,10 +1,10 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import axiosInstance from '../api/api';
 
-export const usePatient = (): UseMutationResult< Error, any> => {
+export const useFee = (): UseMutationResult< Error, any> => {
   const mutationResult = useMutation({
     mutationFn: async (payload: any) => {
-      const response = await axiosInstance.post<any>('/api/create-patient', payload);
+      const response = await axiosInstance.post<any>('/api/create-fee', payload);
       return response.data;
     },
   });

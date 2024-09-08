@@ -15,6 +15,7 @@ import plus from '../../../public/plus.svg';
 import edit from '../../../public/edit.svg';
 import moment from 'moment';
 import { toast } from 'react-toastify';
+import EditFee from '../components/EditFee';
 
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -36,9 +37,10 @@ export default function DashboardPage() {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openFee, setOpenFee] = useState(false);
+
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null); // State for the selected patient
   const [isDiagnose, setIsDiagnose] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null); // State for the selected patient ID
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -68,7 +70,7 @@ export default function DashboardPage() {
   };
 
   const { isLoading: isPatientsLoading, isError: isPatientsError, data: patientsData, error: patientsError } = useQuery({
-    queryKey: ['patients'],
+    queryKey: ['today-patients'],
     queryFn: fetchPatients,
   });
 
@@ -94,11 +96,17 @@ export default function DashboardPage() {
     setOpenEdit(true);
   };
 
-  const handleRowClick = (id: string) => {
-    setSelectedPatientId(id);
+  const handleFee = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent the row click event from firing
+    const patient = patientsData?.find((p: Patient) => p.id === id); // Find the patient by id
+    setSelectedPatient(patient); // Set the selected patient data
+    setOpenFee(true);
+  };
+
+  const handleRowClick = (patient: any) => {
+    setSelectedPatient(patient);
     setIsDiagnose(true);
   };
-console.log({patientsData});
   return (
     <>
       <Header />
@@ -106,7 +114,7 @@ console.log({patientsData});
         <div className="flex flex-row justify-end">
           <button
             onClick={() => setIsPopupOpen(true)}
-            className="mb-4 p-2 bg-black w-52 text-xl text-main text-medium items-center flex justify-center gap-x-3 rounded"
+            className="mb-4 p-2 bg-black hover:bg-grey2 w-52 text-xl text-main text-medium items-center flex justify-center gap-x-3 rounded"
           >
             <Image src={plus} alt="Add Patient" width={16} height={16} />
             Add Patient
@@ -141,11 +149,14 @@ console.log({patientsData});
                   <th className="py-2 px-4">
                     <h3 className=" text-grey4">Edit</h3>
                   </th>
+                  <th className="py-2 px-4">
+                    <h3 className=" text-grey4">Fee </h3>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {patientsData?.map((patient: Patient) => (
-                  <tr key={patient.id} onClick={() => handleRowClick(patient.id)} className="border-b border-borderBase">
+                  <tr key={patient.id} onClick={() => handleRowClick(patient)} className="border-b border-borderBase">
                     <td className="py-2 px-4">
                       <h3 className="text-main">{patient.todayTurn}</h3>
                     </td>
@@ -170,6 +181,15 @@ console.log({patientsData});
                         <Image src={edit} alt="Edit" width={20} height={20} />
                       </button>
                     </td>
+                    <td className="py-2 px-4" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={(e) => handleFee(e, patient.id)} // Pass the event and id
+                        className="p-1"
+                        aria-label="Edit"
+                      >
+                        <Image src={edit} alt="Edit" width={20} height={20} />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -180,10 +200,8 @@ console.log({patientsData});
         </div>
       </div>
 
-      {/* Add Patient Popup */}
       <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
 
-      {/* Edit Patient Popup */}
       {selectedPatient && (
         <EditPopup
           isOpen={openEdit}
@@ -191,9 +209,14 @@ console.log({patientsData});
           patientData={selectedPatient} // Pass selected patient data
         />
       )}
-
-      {/* Diagnose Popup */}
-      <DiagnosePopup isOpen={isDiagnose} onClose={() => setIsDiagnose(false)} patientData={selectedPatientId} />
+       {selectedPatient && (
+        <EditFee
+          isOpen={openFee}
+          onClose={() => setOpenFee(false)}
+          patientData={selectedPatient} // Pass selected patient data
+        />
+      )}
+      <DiagnosePopup isOpen={isDiagnose} onClose={() => setIsDiagnose(false)} patientData={selectedPatient} />
     </>
   );
 }
