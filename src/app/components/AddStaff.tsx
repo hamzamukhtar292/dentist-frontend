@@ -2,27 +2,35 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import cross from '../../../public/cross.svg'; // Adjust the path as needed
-import { usePatient } from '../hooks/usePatient';
 import { toast } from 'react-toastify';
-interface PopupProps {
+import { useStaff } from '../hooks/useStaff';
+interface StaffProps{
   isOpen: boolean;
   onClose: () => void;
 }
 
-const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
+const AddStaff: React.FC<StaffProps> = ({ isOpen, onClose }) => {
   const [name, setName] = useState('');
-  const [age, setAge] = useState(0);
+  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
-  const [todayTurn, setTodayTurn] = useState('');
-  const { mutate, data, error, status, isError, isSuccess } = usePatient();
+  const [personStatus, setPersonStatus] = useState('');
+  const [role, setRole] = useState('');
+
+  const { mutate, data, error, status, isError, isSuccess } = useStaff();
 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({ name, age, phoneNumber, address, todayTurn });
+    mutate({ name, email, phoneNumber, address, personStatus, role });
     onClose();
-    toast.success("Added new patient");
+    toast.success("Added staff member added");
+    setAddress("")
+    setEmail("")
+    setName("")
+    setPersonStatus("")
+    setRole("")
+    setPhoneNumber("")
   };
 
   if (isSuccess && data) {
@@ -47,7 +55,7 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
         <h2 className="text-2xl font-bold mb-4 text-main">Add New Patient</h2>
        <div className='w-full space-y-3'>
        <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
-              Enter patient's name
+              Enter staff name
             </label>
             <input
           type="text"
@@ -58,67 +66,78 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
 
         />
          <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
-              Enter patient's age
+              Enter staff email
             </label>
             <input
           type="text"
-          value={age}
-          onChange={(e) => setAge(Number(e.target.value))}
-          placeholder="Patient's age"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Staff age"
           className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
 
         />
 
 <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
-              Enter patient phone number
+              Enter staff phone number
             </label>
 
         <input
           type="text"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="Patient's phone number"
+          placeholder="Staff phone number"
           className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
 
         />
         <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
-              Enter patient's address
+              Enter staff address
             </label>
             <input
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          placeholder="Patient's address"
+          placeholder="Staff address"
           className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
 
         />
-         <label htmlFor="email" className="block text-sm font-medium text-grey3 mb-2">
-              Enter patient's today turn
+         <label htmlFor="status" className="block text-sm font-medium text-grey3 mb-2">
+              Enter staff status
             </label>
-            <input
-          type="text"
-          value={todayTurn}
-          onChange={(e) => setTodayTurn(e.target.value)}
-          placeholder="Patient's turn"
-          className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
-
-        />
+            <select
+            value={personStatus}
+            onChange={(e) => setPersonStatus(e.target.value)}
+            className="w-full p-3 rounded-md border-none bg-inputMain text-main"
+          >
+            <option value="">Select status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+            <label htmlFor="status" className="block text-sm font-medium text-grey3 mb-2">
+              Enter staff role
+            </label>
+            <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full p-3 rounded-md border-none bg-inputMain text-main"
+          >
+            <option value="">Select role</option>
+            <option value="ADMIN">Admin</option>
+            <option value="DOCTOR">Doctor</option>
+            <option value="STAFF">Nurse</option>
+          </select>
        </div>
-       
-      
        <div>
        <button
           onClick={handleSubmit}
           className="bg-grey2 text-white hover:bg-grey4 w-52 p-2 rounded mt-2"
         >
-          Add Patient
+          Add staff
         </button>
        </div>
-       
       </div>
     </div>
 
   );
 };
 
-export default Popup;
+export default AddStaff;
