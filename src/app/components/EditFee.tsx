@@ -6,6 +6,7 @@ import { usePatient } from '../hooks/usePatient';
 import { toast } from 'react-toastify';
 import { useEditPatient } from '../hooks/useEditPatient';
 import { useQueryClient } from '@tanstack/react-query';
+import { useFee } from '../hooks/useFee';
 
 interface PopupProps {
   isOpen: boolean;
@@ -13,29 +14,27 @@ interface PopupProps {
   patientData?: any; // Make patientData optional
 }
 
-const EditPopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState(0);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [todayTurn, setTodayTurn] = useState('');
-  const { mutate, data, error, status, isError, isSuccess } = useEditPatient();
+const EditFee: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
+  const [checkupFee, setCheckupFee] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [remainingAmount, setRemainingAmount] = useState(0);
+  const [initialAmount, setInitialAmount] = useState(0);
+  const { mutate, data, error, status, isError, isSuccess } = useFee();
   const queryClient = useQueryClient();
 
   // UseEffect to set initial state values from patientData
   useEffect(() => {
     if (patientData) {
-      setName(patientData.name || '');
-      setAge(patientData.age || 0);
-      setPhoneNumber(patientData.phoneNumber || '');
-      setAddress(patientData.address || '');
-      setTodayTurn(patientData.todayTurn || '');
+      setCheckupFee(patientData.checkUpFee || 0);
+      setTotalAmount(patientData.totalAmount || 0);
+      setRemainingAmount(patientData.amountRemaining || 0);
+      setInitialAmount(patientData.initialAmountPaid || 0);
     }
   }, [patientData]); // Run this effect when patientData changes
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({id:patientData.id, data:{name, age, phoneNumber, address, todayTurn }},{
+    mutate({patientId:patientData.id, checkUpFee:checkupFee, totalAmount, amountRemaining:remainingAmount, initialAmountPaid:initialAmount },{
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['today-patients'] });
       },
@@ -61,66 +60,55 @@ const EditPopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
         >
           <Image src={cross} alt="Close" width={16} height={16} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-main">Edit Patient</h2>
+        <h2 className="text-2xl font-bold mb-4 text-main">Fee Details</h2>
         <div className='w-full space-y-3'>
           <label htmlFor="name" className="block text-sm font-medium text-grey3 mb-2">
-            Enter patient's name
+            Enter checkup fee
           </label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Patient name"
+            value={checkupFee}
+            onChange={(e) => setCheckupFee(Number(e.target.value))}
+            placeholder="Checkup fee"
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
           />
           <label htmlFor="age" className="block text-sm font-medium text-grey3 mb-2">
-            Enter patient's age
+            Enter total treatment amount
           </label>
           <input
             type="text"
-            value={age}
-            onChange={(e) => setAge(Number(e.target.value))}
-            placeholder="Patient's age"
+            value={totalAmount}
+            onChange={(e) => setTotalAmount(Number(e.target.value))}
+            placeholder="Total amount"
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
           />
           <label htmlFor="phoneNumber" className="block text-sm font-medium text-grey3 mb-2">
-            Enter patient phone number
+            Enter initial amount paid
           </label>
           <input
             type="text"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="Patient's phone number"
+            value={initialAmount}
+            onChange={(e) => setInitialAmount(Number(e.target.value))}
+            placeholder="Initial amount"
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
           />
           <label htmlFor="address" className="block text-sm font-medium text-grey3 mb-2">
-            Enter patient's address
+            Enter remaining amount
           </label>
           <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            type="Remaining amount"
+            value={remainingAmount}
+            onChange={(e) => setRemainingAmount(Number(e.target.value))}
             placeholder="Patient's address"
             className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
           />
-          <label htmlFor="todayTurn" className="block text-sm font-medium text-grey3 mb-2">
-            Enter patient's today turn
-          </label>
-          <input
-            type="text"
-            value={todayTurn}
-            onChange={(e) => setTodayTurn(e.target.value)}
-            placeholder="Patient's turn"
-            className="w-full p-3 rounded-md border-none placeholder-textMain bg-inputMain text-main"
-          />
         </div>
-
         <div>
           <button
             onClick={handleSubmit}
             className="bg-grey2 text-white hover:bg-grey4 w-52 p-2 rounded mt-2"
           >
-            Edit Patient
+            Edit patient fee
           </button>
         </div>
       </div>
@@ -128,4 +116,4 @@ const EditPopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
   );
 };
 
-export default EditPopup;
+export default EditFee;

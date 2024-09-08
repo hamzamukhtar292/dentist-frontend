@@ -59,17 +59,26 @@ const Header: React.FC = () => {
         <h1 className="text-2xl text-main font-poppins font-semibold">Smile Up</h1>
       </div>
 
-      <nav className="hidden md:flex space-x-8 items-center ">
-        <a href="/dashboard" className={`text-primary ${isCurrentRoute('/dashboard') ? 'bg-base3 rounded-md px-3 py-1' : ''}`}>
-          <h2 className={isCurrentRoute('/dashboard') ? 'text-main1 text-xl' : 'text-main text-xl'}>Dashboard</h2>
-        </a>
-        <a href="/staff" className={`text-primary ${isCurrentRoute('/staff') ? 'bg-base3 rounded-md px-3 py-1' : ''}`}>
-          <h3 className={isCurrentRoute('/staff') ? 'text-main1 text-xl' : 'text-main text-xl'}>Staff</h3>
-        </a>
-        <a href="/patients" className={`text-primary ${isCurrentRoute('/patients') ? 'bg-base3 rounded-md px-3 py-1' : ''}`}>
-          <h3 className={isCurrentRoute('/patients') ? 'text-main1 text-xl' : 'text-main text-xl'}>Patients</h3>
-        </a>
-      </nav>
+      <nav className="hidden md:flex space-x-8 items-center">
+  <a 
+    href="/dashboard" 
+    className={`text-primary px-3 py-1 rounded-md ${isCurrentRoute('/dashboard') ? 'bg-base3 rounded-md px-3 py-1' : ''} hover:bg-grey2`}
+  >
+    <h2 className={isCurrentRoute('/dashboard') ? 'text-main1 text-xl' : 'text-main text-xl'}>Dashboard</h2>
+  </a>
+  <a 
+    href="/staff" 
+    className={`text-primary px-3 py-1 rounded-md ${isCurrentRoute('/staff') ? 'bg-base3 rounded-md px-3 py-1' : ''} hover:bg-grey2`}
+  >
+    <h3 className={isCurrentRoute('/staff') ? 'text-main1 text-xl' : 'text-main text-xl'}>Staff</h3>
+  </a>
+  <a 
+    href="/patients" 
+    className={`text-primary px-3 py-1 rounded-md ${isCurrentRoute('/patients') ? 'bg-base3 rounded-md px-3 py-1' : ''} hover:bg-grey2 `}
+  >
+    <h3 className={isCurrentRoute('/patients') ? 'text-main1 text-xl' : 'text-main text-xl '}>Patients</h3>
+  </a>
+</nav>
 
       <div className="flex flex-row items-center justify-center gap-x-3">
         <Image src={avatar} alt="Avatar" className="h-8 w-8 rounded-full" />
