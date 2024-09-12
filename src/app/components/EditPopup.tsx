@@ -44,10 +44,6 @@ const EditPopup: React.FC<PopupProps> = ({ isOpen, onClose, patientData }) => {
 
   };
 
-  if (isSuccess && data) {
-    console.log(data);
-  }
-
   if (!isOpen) return null;
 
   return (
