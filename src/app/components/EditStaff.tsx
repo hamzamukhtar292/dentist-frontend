@@ -39,10 +39,6 @@ const EditStaff: React.FC<PopupProps> = ({ isOpen, onClose, staffData }) => {
 
   };
 
-  if (isSuccess && data) {
-    console.log(data);
-  }
-
   if (!isOpen) return null;
 
   return (
