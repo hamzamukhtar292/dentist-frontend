@@ -1,12 +1,13 @@
 /* eslint-disable react/jsx-no-undef */
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLogin } from '../hooks/useAuth';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 const LoginPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [email, setEmail] = useState('john.doe@example.com');
   const [password, setPassword] = useState('hamza123');
   const { mutate, data, error, status, isError, isSuccess } = useLogin();
@@ -17,6 +18,12 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     mutate({ email, password });
   };
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/'); // Redirect to the home page or dashboard if authenticated
+    }
+  }, [isAuthenticated, router]);
+
 
   // Redirect to dashboard after successful login
   if (isSuccess && data) {
@@ -76,7 +83,7 @@ const LoginPage: React.FC = () => {
             {status === "pending" ? 'Logging in...' : 'Login'}
           </button>
           {isSuccess && <p>Login successful!</p>}
-          {isError && <p>Error: {error?.message}</p>}
+          {isError && <p className='text-error'>Error: {error?.message}</p>}
         </form>
       </div>
     </div>

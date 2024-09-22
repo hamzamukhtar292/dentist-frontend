@@ -20,30 +20,36 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
   const { mutate, data, error, status, isError, isSuccess } = usePatient();
   const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({ name, age, phoneNumber, address, todayTurn }, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['today-patients'] });
-      },
-    });
+  
+    if (!name || !age || !phoneNumber || !address || !todayTurn) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+  
+    try {
+      await mutate({ name, age, phoneNumber, address, todayTurn }, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['today-patients'] });
+          toast.success("Added new patient");
+          handleClose(); // Close the popup here after success
+        },
+      });
+    } catch (error) {
+      toast.error("Failed to add patient");
+    }
+  };
+  
+  const handleClose = () => {
     onClose();
-    toast.success("Added new patient");
     setAddress("");
     setName("");
     setAge(0);
     setPhoneNumber("");
     setTodayTurn("");
-  };
-  if (!isOpen) return null;
-const handleClose = ( ) => {
-  onClose();
-  setAddress("");
-  setName("");
-  setAge(0);
-  setPhoneNumber("");
-  setTodayTurn("");
-}
+  }
+  
   return (
     <div className="fixed font-inter inset-0 flex items-center justify-center backdrop-blur-md">
     <div className="absolute inset-0 bg-black opacity-20"></div>
@@ -51,7 +57,7 @@ const handleClose = ( ) => {
       className="xs:w-[345px] xs:px-[20px] xs:py-[20px] relative flex flex-col items-center justify-start gap-y-2 rounded-2xl border border-borderBase bg-base sm:w-[739px] lg:px-[40px] lg:py-[15px]"
     >
         <button
-          onClick={() => handleClose}
+          onClick={handleClose}
           className="absolute top-4 right-4"
           aria-label="Close"
         >

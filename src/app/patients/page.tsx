@@ -26,7 +26,7 @@ export default function AboutPage() {
   }, [isAuthenticated, router]);
 
   const fetchPatientsData = async () => {
-    const response = await axiosInstance.get(`${baseURL}/api/patients`);
+    const response = await axiosInstance.get(`${baseURL}/api/all-patients`);
     return response.data;
   };
 
@@ -81,8 +81,9 @@ export default function AboutPage() {
                     <h3 className=" text-grey4">Name</h3>
                   </th>
                   <th className="py-2 px-4">
-                    <h3 className=" text-grey4">Email</h3>
+                    <h3 className="text-grey4">Age</h3>
                   </th>
+                 
                   <th className="py-2 px-4">
                     <h3 className=" text-grey4">Address</h3>
                   </th>
@@ -90,34 +91,28 @@ export default function AboutPage() {
                     <h3 className="text-grey4">Cell number</h3>
                   </th>
                   <th className="py-2 px-4">
-                    <h3 className="text-grey4">Role</h3>
-                  </th>
-                  <th className="py-2 px-4">
                     <h3 className=" text-grey4">Edit</h3>
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {patientsData?.map((staff: Staff) => (
-                  <tr key={staff.id} onClick={() => handleRowClick(staff.id)} className="border-b border-borderBase rounded-3xl">
+                {patientsData?.map((patient: Staff) => (
+                  <tr key={patient.id} onClick={() => handleRowClick(patient.id)} className="border-b border-borderBase rounded-3xl">
                     <td className="py-2 px-4">
-                      <h3 className="text-main">{staff.name}</h3>
+                      <h3 className="text-main">{patient.name}</h3>
                     </td>
                     <td className="py-2 px-4">
-                      <h3 className="text-main">{staff.email}</h3>
+                      <h3 className="text-main">{patient.age}</h3>
                     </td>
                     <td className="py-2 px-4">
-                      <h3 className="text-main">{staff.address}</h3>
+                      <h3 className="text-main">{patient.address}</h3>
                     </td>
                     <td className="py-2 px-4">
-                      <h3 className="text-main">{staff.phoneNumber}</h3>
-                    </td>
-                    <td className="py-2 px-4">
-                      <h3 className="text-main">{staff.role}</h3>
+                      <h3 className="text-main">{patient.phoneNumber}</h3>
                     </td>
                     <td className="py-2 px-4" onClick={(e) => e.stopPropagation()}>
                       <button
-                        onClick={(e) => handleEdit(e, staff.id)} // Pass the event and id
+                        onClick={(e) => handleEdit(e, patient.id)} // Pass the event and id
                         className="p-1"
                         aria-label="Edit"
                       >
@@ -129,7 +124,7 @@ export default function AboutPage() {
               </tbody>
             </table>
           ) : (
-            <p>No patients for today.</p>
+            <p>No patients found</p>
           )}
         </div>
       </div>

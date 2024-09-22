@@ -22,19 +22,27 @@ const AddStaff: React.FC<StaffProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+  
+    // Check for required fields
+    if (!name || !phoneNumber || !address || !role) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+  
+    // Proceed with mutation if validation passes
     mutate({ name, email, phoneNumber, address, personStatus, role });
-    onClose();
-    toast.success("Added staff member added");
-    setAddress("")
-    setEmail("")
-    setName("")
-    setPersonStatus("")
-    setRole("")
-    setPhoneNumber("")
+    onClose(); // Close the popup after submitting
+    toast.success("Added staff member"); // Adjusted message
+    setAddress("");
+    setEmail("");
+    setName("");
+    setPersonStatus("");
+    setRole("");
+    setPhoneNumber("");
   };
+  
 
   if (isSuccess && data) {
-    console.log(data);
     console.log(data);
 
   }

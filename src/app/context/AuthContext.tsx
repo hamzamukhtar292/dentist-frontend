@@ -13,19 +13,13 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    // Initialize token from localStorage
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
-    }
-    return null;
-  });
-
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Track loading state
   const router = useRouter();
 
   useEffect(() => {
-    // Sync the state with localStorage
-    if (!token) {
+    // Initialize token from localStorage
+    if (typeof window !== 'undefined') {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         setToken(storedToken);
@@ -33,7 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/login'); // If no token, redirect to login
       }
     }
-  }, [token, router]);
+    setLoading(false); // Mark loading as complete
+  }, [router]);
 
   const login = (newToken: string) => {
     setToken(newToken);
@@ -45,6 +40,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token');
     router.push('/login');
   };
+
+  if (loading) {
+    return null; // Or a loader/spinner component if you want
+  }
 
   return (
     <AuthContext.Provider value={{ token, isAuthenticated: !!token, login, logout }}>

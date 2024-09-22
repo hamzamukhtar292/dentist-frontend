@@ -200,7 +200,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+    {isPopupOpen &&  <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />}
+
 
       {selectedPatient && (
         <EditPopup
