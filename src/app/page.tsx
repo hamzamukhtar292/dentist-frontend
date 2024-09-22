@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div className='bg-base font-poppins '>
-      <p className=' text-3xl h-screen items-center justify-center'>Loading...</p>
+      <p className=' text-3xl h-screen items-center justify-center text-main'>Loading...</p>
     </div>
   );
 }
