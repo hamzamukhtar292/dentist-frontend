@@ -44,7 +44,7 @@ const AddStaff: React.FC<StaffProps> = ({ isOpen, onClose }) => {
 
   if (isSuccess && data) {
     console.log(data);
-
+    console.log(data);
   }
 
   if (!isOpen) return null;
