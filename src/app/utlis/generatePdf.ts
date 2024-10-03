@@ -119,6 +119,6 @@ const generatePDF = (patientData: any) => {
   //ts-ignore
     pdfMake.createPdf(docDefinition).download(`${currentDate}_${patientData.phoneNumber}.pdf`);
   } else {
-    console.log('No patient data found for generating the PDF.');
+    console.log('No data found for generating the PDF.');
   }
 };
