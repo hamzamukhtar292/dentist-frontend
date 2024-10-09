@@ -113,7 +113,6 @@ const generatePDF = (patientData: any) => {
       },
     };
 
-    // Current date for the file name
     const currentDate = new Date().toISOString().split('T')[0];
 
   //ts-ignore
